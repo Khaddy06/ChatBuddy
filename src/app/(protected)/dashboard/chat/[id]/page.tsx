@@ -109,8 +109,8 @@ export default function ChatPage() {
 
   return (
     <div className="flex flex-col h-full min-h-screen">
-      <h1 className="text-2xl font-semibold p-4 border-b bg-white">
-       {receiver?.name || "your buddy"}
+      <h1 className="text-2xl text-black font-semibold p-4 border-b bg-white">
+        {receiver?.name || "your buddy"}
       </h1>
 
       <div className="flex-1 overflow-y-auto p-4 bg-gray-100 space-y-3">
@@ -120,7 +120,7 @@ export default function ChatPage() {
             className={`max-w-xs p-2 rounded-lg ${
               msg.sender === uid
                 ? "bg-blue-500 text-white ml-auto"
-                : "bg-white border"
+                : "bg-white border text-black"
             }`}
           >
             <p>{msg.text}</p>
