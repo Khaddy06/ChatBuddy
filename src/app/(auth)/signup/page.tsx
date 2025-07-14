@@ -3,6 +3,7 @@ import { auth, db } from "@/lib/firebase";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { setDoc, doc } from "firebase/firestore";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -23,7 +24,7 @@ const schema = yup.object().shape({
     .required("Please confirm your password"),
 });
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [showpassword, setShowPassword] = useState(false);
   const [confirmShowPassword, setConfirmShowPassword] = useState(false);
   const router = useRouter();
@@ -129,7 +130,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
-                {showpassword ? "SHOW" : "HIDE"}
+                {showpassword ?  <Eye size={18}/>:<EyeOff size={18}/> }
               </button>
             </div>
             {errors.password && (
@@ -155,7 +156,7 @@ export default function LoginPage() {
                 type="button"
                 onClick={() => setConfirmShowPassword((prev) => !prev)}
               >
-                {confirmShowPassword ? "SHOW" : "HIDE"}
+                {confirmShowPassword ? <Eye size={18}/>:<EyeOff size={18}/>}
               </button>
             </div>
             {errors.password && (

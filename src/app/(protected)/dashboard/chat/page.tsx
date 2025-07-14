@@ -27,7 +27,6 @@ export default function ChatListPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [uid, setUid] = useState<string | null>(null);
   const [userNames, setUserNames] = useState<{ [uid: string]: string }>({});
-  
 
   // Get current user
   useEffect(() => {
@@ -58,8 +57,6 @@ export default function ChatListPage() {
 
     return () => unsubscribe();
   }, [uid]);
-
-
 
   // Fetch names of other users
   useEffect(() => {
@@ -95,9 +92,6 @@ export default function ChatListPage() {
         <p className="text-gray-500">No chats yet. Start a conversation!</p>
       ) : (
         <ul className="space-y-4">
-  
-
-
           {conversations.map(
             ({ chatId, participants, lastMessage, lastMessageTimestamp }) => {
               const otherUserId = participants.find((p) => p !== uid);
@@ -109,6 +103,8 @@ export default function ChatListPage() {
                     minute: "2-digit",
                   })
                 : "";
+
+              // Add state to track unread count
 
               return (
                 <li key={chatId}>
@@ -131,11 +127,13 @@ export default function ChatListPage() {
                         </p>
                       </div>
                     </div>
-                    {timeString && (
-                      <span className="text-xs text-gray-400">
-                        {timeString}
-                      </span>
-                    )}
+                    <div className="flex items-center gap-2">
+                      {timeString && (
+                        <span className="text-xs text-gray-400">
+                          {timeString}
+                        </span>
+                      )}
+                    </div>
                   </Link>
                 </li>
               );

@@ -7,6 +7,7 @@ import {  useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as yup from "yup";
+import { Eye, EyeOff } from "lucide-react";
 
 const schema = yup.object().shape({
   email: yup.string().email("Invalid email").required("Email is required"),
@@ -85,7 +86,7 @@ export default function LoginPage() {
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-blue-600"
                 onClick={() => setShowPassword((prev) => !prev)}
               >
-                {showPassword ? "HIDE" : "SHOW"}
+                {showPassword ? <Eye size={18}/>:<EyeOff size={18}/>}
               </button>
             </div>
             {errors.password && (
