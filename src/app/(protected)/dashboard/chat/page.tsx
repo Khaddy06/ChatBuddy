@@ -117,7 +117,7 @@ export default function ChatListPage() {
                         {name ? name.charAt(0) : "?"}
                       </div>
                       <div>
-                        <p className="font-semibold">
+                        <p className="font-semibold text-lg text-black">
                           {name ?? (
                             <span className="inline-block h-4 w-24 bg-gray-200 animate-pulse rounded" />
                           )}
