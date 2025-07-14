@@ -57,7 +57,8 @@ export default function LoginPage() {
               type="email"
               placeholder="you@example.com"
               {...register("email")}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm
+              text-black  placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.email && (
               <p className="text-red-600 text-xs mt-1">
@@ -75,7 +76,8 @@ export default function LoginPage() {
                 type={showPassword ? "text" : "password"}
                 placeholder="enter password"
                 {...register("password")}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-4
+                text-black placeholder:text-gray-500 py-2 pr-16 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
 
               <button

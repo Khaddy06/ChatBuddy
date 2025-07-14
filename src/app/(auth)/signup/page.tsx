@@ -85,7 +85,8 @@ export default function LoginPage() {
               type="name"
               placeholder="enter your name"
               {...register("name")}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm 
+              text-black  placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.name && (
               <p className="text-red-600 text-xs mt-1">
@@ -101,7 +102,8 @@ export default function LoginPage() {
               type="email"
               placeholder="you@example.com"
               {...register("email")}
-              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm 
+              text-black  placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-400"
             />
             {errors.email && (
               <p className="text-red-600 text-xs mt-1">
@@ -119,7 +121,8 @@ export default function LoginPage() {
                 type={showpassword ? "text" : "password"}
                 placeholder="enter password"
                 {...register("password")}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 
+                text-black  placeholder:text-gray-500 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <button
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-blue-600"
@@ -144,7 +147,8 @@ export default function LoginPage() {
                 type={confirmShowPassword ? "text" : "password"}
                 placeholder="confirm password"
                 {...register("confirmPassword")}
-                className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+                className="w-full border border-gray-300 rounded-lg 
+                 text-black  placeholder:text-gray-500 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
               <button
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-sm text-blue-600"
@@ -163,7 +167,8 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition"
+            className="w-full bg-blue-600 hover:bg-blue-700 text-white 
+            font-semibold rounded-lg py-2 transition"
           >
             {isSubmitting ? "Creating account..." : "Sign Up"}
           </button>

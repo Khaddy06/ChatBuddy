@@ -143,7 +143,7 @@ export default function ChatPage() {
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-1 border px-4 py-2 rounded-lg focus:outline-none"
+          className="flex-1 border px-4 py-2 text-black  placeholder:text-gray-500 rounded-lg focus:outline-none"
         />
         <button
           type="submit"
