@@ -10,7 +10,8 @@ import {
   query,
   where,
 } from "firebase/firestore";
-import Link from "next/link";
+import ChatListItem from "./components/ChatListItem";
+import { toast } from "sonner";
 
 interface Conversation {
   chatId: string;
@@ -19,7 +20,7 @@ interface Conversation {
   lastMessageTimestamp: {
     seconds: number;
     nanoseconds: number;
-    toDate: () => Date; // Firestore Timestamp method
+    toDate: () => Date;
   };
 }
 
@@ -28,7 +29,10 @@ export default function ChatListPage() {
   const [uid, setUid] = useState<string | null>(null);
   const [userNames, setUserNames] = useState<{ [uid: string]: string }>({});
 
-  // Get current user
+  useEffect(() => {
+    toast("🔔 Toast is working!");
+  }, []);
+  // Get current user UID
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) setUid(user.uid);
@@ -36,7 +40,7 @@ export default function ChatListPage() {
     return () => unsubscribe();
   }, []);
 
-  // Get conversations
+  // Get all conversations
   useEffect(() => {
     if (!uid) return;
 
@@ -58,7 +62,7 @@ export default function ChatListPage() {
     return () => unsubscribe();
   }, [uid]);
 
-  // Fetch names of other users
+  // Fetch other users' names
   useEffect(() => {
     const unknownUids = conversations
       .map((c) => c.participants.find((p) => p !== uid))
@@ -66,79 +70,52 @@ export default function ChatListPage() {
 
     if (unknownUids.length === 0) return;
 
-    const fetchMissingUsers = async () => {
+    const fetchNames = async () => {
       const newNames: { [uid: string]: string } = {};
-
-      for (const uid of unknownUids) {
-        const snap = await getDoc(doc(db, "users", uid));
+      for (const otherId of unknownUids) {
+        const snap = await getDoc(doc(db, "users", otherId));
         if (snap.exists()) {
           const data = snap.data();
-          newNames[uid] = data.name || data.email || "Unknown";
+          newNames[otherId] = data.name || data.email || "Unknown";
         }
       }
-
       setUserNames((prev) => ({ ...prev, ...newNames }));
     };
 
-    fetchMissingUsers();
+    fetchNames();
   }, [conversations, uid, userNames]);
 
   if (!uid) return <p className="p-8 text-gray-500">Loading user...</p>;
 
   return (
     <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4">Chats</h1>
+      <h1 className="text-2xl font-bold mb-4 text-black">Chats</h1>
       {conversations.length === 0 ? (
         <p className="text-gray-500">No chats yet. Start a conversation!</p>
       ) : (
         <ul className="space-y-4">
-          {conversations.map(
-            ({ chatId, participants, lastMessage, lastMessageTimestamp }) => {
-              const otherUserId = participants.find((p) => p !== uid);
-              if (!otherUserId) return null;
-              const name = userNames[otherUserId];
-              const timeString = lastMessageTimestamp?.toDate?.()
-                ? lastMessageTimestamp.toDate().toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "";
+          {conversations.map(({ chatId, participants, lastMessage, lastMessageTimestamp }) => {
+            const otherUserId = participants.find((p) => p !== uid);
+            if (!otherUserId) return null;
+            const name = userNames[otherUserId];
+            const timeString = lastMessageTimestamp?.toDate?.()
+              ? lastMessageTimestamp.toDate().toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
+              : "";
 
-              // Add state to track unread count
-
-              return (
-                <li key={chatId}>
-                  <Link
-                    href={`/dashboard/chat/${otherUserId}`}
-                    className="flex items-center justify-between gap-3 p-4 bg-white rounded shadow hover:bg-blue-50 transition"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-800 flex items-center justify-center font-bold text-sm uppercase">
-                        {name ? name.charAt(0) : "?"}
-                      </div>
-                      <div>
-                        <p className="font-semibold text-lg text-black">
-                          {name ?? (
-                            <span className="inline-block h-4 w-24 bg-gray-200 animate-pulse rounded" />
-                          )}
-                        </p>
-                        <p className="text-gray-600 truncate max-w-xs">
-                          {lastMessage}
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      {timeString && (
-                        <span className="text-xs text-gray-400">
-                          {timeString}
-                        </span>
-                      )}
-                    </div>
-                  </Link>
-                </li>
-              );
-            }
-          )}
+            return (
+              <ChatListItem
+                key={chatId}
+                chatId={chatId}
+                otherUserId={otherUserId}
+                name={name}
+                lastMessage={lastMessage}
+                timeString={timeString}
+              />
+            );
+          })}
         </ul>
       )}
     </div>

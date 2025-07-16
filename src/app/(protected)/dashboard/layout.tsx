@@ -5,11 +5,14 @@ import { signOut } from "firebase/auth";
 import type { ReactNode } from "react";
 import { auth } from "@/lib/firebase";
 import SidebarLink from "@/app/components/sidebar";
-import { useState } from "react";
+import {  useState } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
+
+ 
+  
   const handleLogOut = async () => {
     try {
       await signOut(auth);
