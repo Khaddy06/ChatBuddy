@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import ChatListItem from "./components/ChatListItem";
 import { toast } from "sonner";
+import SearchForFriendModal from "./components/searchForFriendModal";
 
 interface Conversation {
   chatId: string;
@@ -28,7 +29,7 @@ export default function ChatListPage() {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [uid, setUid] = useState<string | null>(null);
   const [userNames, setUserNames] = useState<{ [uid: string]: string }>({});
-
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   useEffect(() => {
     toast("🔔 Toast is working!");
   }, []);
@@ -88,35 +89,50 @@ export default function ChatListPage() {
   if (!uid) return <p className="p-8 text-gray-500">Loading user...</p>;
 
   return (
-    <div className="p-8">
-      <h1 className="text-2xl font-bold mb-4 text-black">Chats</h1>
+    <div className="min-h-screen bg-[#FFF7F5] px-4 sm:px-8 py-6">
+      <div className="flex items-center justify-between mb-5 ">
+      <h1 className="text-xl sm:text-2xl font-bold text-[#1E1E1E] ">Chats</h1>
+
+      <button
+          onClick={() => setIsSearchModalOpen(true)}
+          className="bg-[#F7717D] text-white text-sm sm:text-base font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#f55e6d] transition-colors duration-200"
+        >
+          Search Friend
+        </button>
+           </div>
       {conversations.length === 0 ? (
         <p className="text-gray-500">No chats yet. Start a conversation!</p>
       ) : (
         <ul className="space-y-4">
-          {conversations.map(({ chatId, participants, lastMessage, lastMessageTimestamp }) => {
-            const otherUserId = participants.find((p) => p !== uid);
-            if (!otherUserId) return null;
-            const name = userNames[otherUserId];
-            const timeString = lastMessageTimestamp?.toDate?.()
-              ? lastMessageTimestamp.toDate().toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-              : "";
+          {conversations.map(
+            ({ chatId, participants, lastMessage, lastMessageTimestamp }) => {
+              const otherUserId = participants.find((p) => p !== uid);
+              if (!otherUserId) return null;
+              const name = userNames[otherUserId];
+              const timeString = lastMessageTimestamp?.toDate?.()
+                ? lastMessageTimestamp.toDate().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                : "";
 
-            return (
-              <ChatListItem
-                key={chatId}
-                chatId={chatId}
-                otherUserId={otherUserId}
-                name={name}
-                lastMessage={lastMessage}
-                timeString={timeString}
-              />
-            );
-          })}
+              return (
+                <ChatListItem
+                  key={chatId}
+                  chatId={chatId}
+                  otherUserId={otherUserId}
+                  name={name}
+                  lastMessage={lastMessage}
+                  timeString={timeString}
+                />
+              );
+            }
+          )}
         </ul>
+      )}
+
+      {isSearchModalOpen && (
+        <SearchForFriendModal onClose={() => setIsSearchModalOpen(false)} />
       )}
     </div>
   );

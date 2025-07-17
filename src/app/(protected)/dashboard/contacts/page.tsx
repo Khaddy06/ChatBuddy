@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { UserCircle2 } from "lucide-react";
 import { getContacts } from "@/lib/getContact";
+import { getChatId } from "@/lib/chatutil";
 
 interface User {
   lastMessage: string;
@@ -31,43 +32,45 @@ export default function ContactsPage() {
   }, []);
 
   return (
-    <div className="p-8">
-      <h2 className="text-2xl text-black  font-semibold mb-4">Contact</h2>
+    <div className="min-h-screen bg-[#F8F6FC] p-8">
+      <h2 className="text-2xl md:text-3xl font-bold text-[#7F2982] mb-6 drop-shadow-sm">Contacts</h2>
 
       {loading ? (
-        <div className="animate-pulse space-y-3">
-          <div className="h-14 bg-gray-200 rounded-lg" />
-          <div className="h-14 bg-gray-200 rounded-lg" />
+        <div className="animate-pulse space-y-4">
+          <div className="h-16 bg-[#E0E0E0] rounded-2xl" />
+          <div className="h-16 bg-[#E0E0E0] rounded-2xl" />
         </div>
       ) : contacts.length === 0 ? (
-        <p className="text-gray-500">No users found.</p>
+        <p className="text-[#7F2982] text-lg">No users found.</p>
       ) : (
-        <div className="space-y-3">
-          {contacts.map((contact) => (
-            <Link href={`/dashboard/chat/${contact.uid}`} key={contact.uid}>
-              <div className="flex items-center gap-3 mb-3 p-6 bg-blue-400 rounded-xl shadow-sm cursor-pointer hover:bg-blue-500 transition">
-                <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                  <UserCircle2 className="text-gray-500 w-6 h-6" />
+        <div className="space-y-4 ">
+          {contacts.map((contact) => {
+            const currentUser = auth.currentUser?.uid;
+            const chatId = currentUser && contact.uid
+              ? getChatId(currentUser, contact.uid)
+              : contact.uid;
+            return (
+              <Link href={`/dashboard/chat/${chatId}`} key={contact.uid}>
+                <div className="flex items-center  gap-4 p-5 bg-gradient-to-r from-[#F8F6FC] via-[#F7717D]/10 to-[#7F2982]/10 rounded-2xl shadow-md cursor-pointer hover:from-[#F7717D]/20 hover:to-[#7F2982]/20 transition">
+                  <div className="w-12 h-12 rounded-full bg-[#E0E0E0] flex items-center justify-center shadow-sm">
+                    <UserCircle2 className="text-[#7F2982] w-7 h-7" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-lg font-semibold text-[#7F2982] truncate">{contact.name}</p>
+                    <p className="text-sm text-[#1E1E1E]/80 truncate">{contact.lastMessage || "No messages yet"}</p>
+                  </div>
+                  <div className="text-xs text-[#7F2982]/60 min-w-fit">
+                    {contact.timestamp
+                      ? new Date(contact.timestamp).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })
+                      : ""}
+                  </div>
                 </div>
-                <div className="flex-1">
-                  <p className="text-lg font-medium text-white">
-                    {contact.name}
-                  </p>
-                  <p className="text-sm text-white/80 truncate">
-                    {contact.lastMessage || "No messages yet"}
-                  </p>
-                </div>
-                <div className="text-xs text-white/60">
-                  {contact.timestamp
-                    ? new Date(contact.timestamp).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })
-                    : ""}
-                </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

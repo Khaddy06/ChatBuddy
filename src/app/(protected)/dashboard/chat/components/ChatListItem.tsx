@@ -20,18 +20,22 @@ export default function ChatListItem({
 }: ChatListItemProps) {
   return (
     <li key={chatId}>
-      <Link
-        href={`/dashboard/chat/${otherUserId}`}
-        className="flex items-center justify-between gap-3 p-4 bg-white rounded shadow hover:bg-blue-50 transition"
-      >
-        <div className="flex items-center gap-3">
-          <Avatar name={name} />
-          <ChatInfo name={name} lastMessage={lastMessage} />
-        </div>
-        <div className="flex flex-col items-center gap-3">
-          <TimeDisplay timeString={timeString} />
-        </div>
-      </Link>
-    </li>
+    <Link
+      href={`/dashboard/chat/${otherUserId}`}
+      className="flex items-center justify-between bg-white rounded-lg shadow-sm px-4 py-3 hover:shadow-md transition-shadow"
+    >
+      {/* Left: Avatar + Info */}
+      <div className="flex items-center gap-3">
+        <Avatar name={name} />
+        <ChatInfo name={name} lastMessage={lastMessage} />
+      </div>
+  
+      {/* Right: Time */}
+      <div className="text-sm text-gray-400 whitespace-nowrap pl-4">
+        <TimeDisplay timeString={timeString} />
+      </div>
+    </Link>
+  </li>
+  
   );
 } 

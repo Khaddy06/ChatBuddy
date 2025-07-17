@@ -1,18 +1,22 @@
 "use client";
-import { Menu, X, Users, Settings, LogOut, MessageCircle } from "lucide-react";
+import {
+  Menu,
+  X,
+  Settings,
+  LogOut,
+  MessageCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signOut } from "firebase/auth";
 import type { ReactNode } from "react";
 import { auth } from "@/lib/firebase";
 import SidebarLink from "@/app/components/sidebar";
-import {  useState } from "react";
+import { useState } from "react";
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const router = useRouter();
 
- 
-  
   const handleLogOut = async () => {
     try {
       await signOut(auth);
@@ -21,13 +25,15 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       console.error("Logout error:", error);
     }
   };
+
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50 relative">
+    <div className="flex h-screen overflow-hidden
+     bg-gradient-to-br from-[#F8F6FC] via-[#F5F3F7] to-[#F8F6FC] relative">
       {/* Mobile Menu Button */}
       {!mobileOpen && (
         <button
           onClick={() => setMobileOpen(true)}
-          className="absolute top-4 right-4 z-50 font-bold mt-3 md:hidden text-blue-600"
+          className="absolute top-4 right-4 z-50 font-bold mt-3 md:hidden text-[#7F2982] bg-white/80 rounded-full p-2 shadow-md hover:bg-[#F7717D]/10 transition"
         >
           <Menu size={24} />
         </button>
@@ -35,31 +41,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
 
       {/* Mobile Modal */}
       {mobileOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/60 backdrop-blur-sm md:hidden">
-
-
-          <div className="w-[90%] max-w-sm bg-white rounded-xl shadow-lg p-6 relative">
-            {/* Close Button */}
-           
-
-            {/* Modal Content */}
-            <div className="mb-6  text-2xl font-semibold text-blue-600 flex justify-between">
-              <h2 className="text-2xl font-semibold text-blue-600">ChatBuddy</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#F8F6FC]/80 backdrop-blur-sm md:hidden">
+          <div className="w-[90%] max-w-sm bg-white rounded-3xl shadow-2xl p-8 relative border border-[#E0E0E0]">
+            <div className="mb-6 flex justify-between items-center text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] drop-shadow-sm">
+              <h2>ChatBuddy</h2>
               <button
-              onClick={() => setMobileOpen(false)}
-              className="text-black font-bold hover:text-gray-700"
-            >
-              <X size={25} />
-            </button>
+                onClick={() => setMobileOpen(false)}
+                className="text-[#7F2982] hover:text-[#F7717D] transition"
+              >
+                <X size={25} />
+              </button>
             </div>
 
-            <nav className="space-y-3 text-sm">
-              <SidebarLink
-                href="/dashboard/contacts"
-                label="Contacts"
-                icon={Users}
-                onClick={() => setMobileOpen(false)}
-              />
+            <nav className="space-y-4 text-base font-semibold">
               <SidebarLink
                 href="/dashboard/chat"
                 label="Chat"
@@ -74,11 +68,10 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               />
             </nav>
 
-            <div className="pt-6">
+            <div className="pt-8">
               <p
-                 onClick={handleLogOut}
-                className="flex items-center gap-3 px-4 py-2 text-lg font-medium
-                  text-gray-500 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors"
+                onClick={handleLogOut}
+                className="flex items-center gap-3 px-4 py-2 text-lg font-bold text-[#7F2982] hover:bg-[#F7717D]/10 hover:text-[#F7717D] rounded-xl transition-colors cursor-pointer"
               >
                 <LogOut size={20} />
                 Logout
@@ -89,20 +82,19 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       )}
 
       {/* Desktop Sidebar */}
-      <aside className="w-40 h-screen bg-white shadow-r hidden md:flex flex-col justify-between shadow-sm">
+      <aside className="w-56 h-screen mx-auto bg-white shadow-xl hidden md:flex flex-col justify-between  border-r border-[#E0E0E0]">
         <div>
-          <div className="p-6 text-2xl font-semibold text-blue-600">ChatBuddy</div>
-          <nav className="px-4 pt-2 space-y-1 text-sm">
-            <SidebarLink href="/dashboard/contacts" label="Contacts" icon={Users} />
+          <div className="p-8 text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] drop-shadow-sm">ChatBuddy</div>
+          <nav className="px-6 pt-4 space-y-2 text-base font-semibold">
+            {/* <SidebarLink href="/dashboard/contacts" label="Contacts" icon={Users} /> */}
             <SidebarLink href="/dashboard/chat" label="Chat" icon={MessageCircle} />
             <SidebarLink href="#" label="Settings" icon={Settings} />
           </nav>
         </div>
-        <div className="px-4 pb-4">
+        <div className="px-6 pb-8">
           <p
             onClick={handleLogOut}
-            className="flex items-center gap-3 px-3 py-2 text-xl font-medium
-              text-gray-500 hover:bg-red-50 hover:text-red-500 rounded-md transition-colors"
+            className="flex items-center gap-3 px-4 py-2 text-lg font-bold text-[#7F2982] hover:bg-[#F7717D]/10 hover:text-[#F7717D] rounded-xl transition-colors cursor-pointer"
           >
             <LogOut size={20} />
             Logout
@@ -110,8 +102,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto bg-gray-50">{children}</main>
+      <main className="flex-1 overflow-y-auto bg-gradient-to-br from-[#F8F6FC] via-[#F5F3F7] to-[#F8F6FC]">{children}</main>
     </div>
   );
-};
-
+}
