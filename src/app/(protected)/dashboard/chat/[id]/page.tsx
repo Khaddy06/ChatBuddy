@@ -7,6 +7,12 @@ import {
   doc,
   serverTimestamp,
   deleteDoc,
+  orderBy,
+  collection,
+  getDocs,
+  limit,
+  query,
+  updateDoc,
  
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -98,6 +104,17 @@ const toggleChatSelection = (chatId: string) => {
     );
     setSelectedChats([]);
     setShowDeleteModal(false);
+
+    // Update conversation lastMessage and timestamp
+    const  chatRef = collection(db,"messages", chatId, "chats");
+    const q = query(chatRef,orderBy("createdAt", "desc"),limit(1));
+    const snapshot =await getDocs(q);
+    const last = snapshot.docs[0] 
+
+    await updateDoc(doc(db, "conversations", chatId),{
+      lastMessage:last? last.data().text: "",
+      lastMessageTimestamp: last? last.data().createdAt: null
+    });
   };
 
   if (!uid || !id) return <div className="p-4">Loading chat...</div>;

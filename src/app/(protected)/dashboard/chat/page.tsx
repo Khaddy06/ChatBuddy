@@ -11,7 +11,6 @@ import {
   where,
 } from "firebase/firestore";
 import ChatListItem from "./components/ChatListItem";
-import { toast } from "sonner";
 import SearchForFriendModal from "./components/searchForFriendModal";
 
 interface Conversation {
@@ -30,9 +29,9 @@ export default function ChatListPage() {
   const [uid, setUid] = useState<string | null>(null);
   const [userNames, setUserNames] = useState<{ [uid: string]: string }>({});
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
-  useEffect(() => {
-    toast("🔔 Toast is working!");
-  }, []);
+  // useEffect(() => {
+  //   toast("🔔 Toast is working!");
+  // }, []);
   // Get current user UID
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
