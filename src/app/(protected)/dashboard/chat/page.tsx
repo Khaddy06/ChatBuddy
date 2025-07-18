@@ -92,13 +92,14 @@ export default function ChatListPage() {
     <div className="min-h-screen bg-[#FFF7F5] px-4 sm:px-8 py-6">
       <div className="flex items-center justify-between mb-5 ">
       <h1 className="text-xl sm:text-2xl font-bold text-[#1E1E1E] ">Chats</h1>
-
+      <div> 
       <button
           onClick={() => setIsSearchModalOpen(true)}
           className="bg-[#F7717D] text-white text-sm sm:text-base font-semibold px-4 py-2 rounded-lg shadow hover:bg-[#f55e6d] transition-colors duration-200"
         >
           Search Friend
         </button>
+           </div>
            </div>
       {conversations.length === 0 ? (
         <p className="text-gray-500">No chats yet. Start a conversation!</p>

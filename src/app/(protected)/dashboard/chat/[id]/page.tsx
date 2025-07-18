@@ -6,6 +6,7 @@ import {
   setDoc,
   doc,
   serverTimestamp,
+  deleteDoc,
  
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
@@ -13,8 +14,9 @@ import { useAuthUid } from "@/app/hooks/useAuthUid";
 import { useChatMessages } from "@/app/hooks/useChatMessage";
 import { useReceiver } from "@/app/hooks/useReceiver";
 import { useSendMessage } from "@/app/hooks/useSendMessage";
-import { Smile } from "lucide-react";
+import { Smile, Menu, Trash2 } from "lucide-react";
 import EmojiPicker from "../components/emojiPicker";
+import DeleteChatsModal from "../components/deleteModal";
 
 export default function ChatPage() {
   const rawId = useParams().id;
@@ -33,6 +35,15 @@ export default function ChatPage() {
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [selectedChats, setSelectedChats] = useState<string[]>([]);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+const toggleChatSelection = (chatId: string) => {
+  setSelectedChats(prev =>
+    prev.includes(chatId) ? prev.filter(id => id !== chatId) : [...prev, chatId]
+  );
+};
+
 
   // Handle emoji select
   const handleSelectEmoji = (emoji: { native: string }) => {
@@ -78,112 +89,129 @@ export default function ChatPage() {
     setNewMessage("");
   };
 
-  // Delete chat handler
-  // async function handleDeleteSingleMessage(chatId: string, messageId: string) {
-  //   if (!chatId || !messageId) return;
-
-  //   try {
-  //     await deleteDoc(doc(db, "messages", chatId, "chats", messageId));
-  //     console.log("Message deleted successfully");
-  //   } catch (error) {
-  //     console.error("Error deleting message:", error);
-  //   }
-  // }
+  const handleDeleteChat = async () => {
+    if (!chatId) return;
+    await Promise.all(
+      selectedChats.map(messageId =>
+        deleteDoc(doc(db, "messages", chatId, "chats", messageId))
+      )
+    );
+    setSelectedChats([]);
+    setShowDeleteModal(false);
+  };
 
   if (!uid || !id) return <div className="p-4">Loading chat...</div>;
 
   return (
     <div className="flex flex-col h-full min-h-screen bg-[#F8F6FC] text-[#1E1E1E]">
-      <h1 className="text-lg md:text-xl font-bold px-4 py-3 bg-white text-[#7F2982] border-b border-[#E0E0E0] shadow-sm flex items-center justify-between">
-        <span>{receiver?.name || "Your buddy"}</span>
-        {/* <button
-          onClick={() => setShowDeleteModal(true)}
-          className="ml-4 px-3 py-1 rounded-lg bg-[#F7717D] text-white text-sm font-semibold hover:bg-[#DE639A] transition"
+      <h1 className="relative text-lg md:text-xl font-bold px-2 md:px-4 py-3 bg-white text-[#7F2982] border-b border-[#E0E0E0] shadow-sm flex items-center justify-center md:justify-between">
+        {/* Mobile menu button */}
+        <button
+          onClick={() => {
+            if (typeof window !== 'undefined') {
+              const evt = new CustomEvent('open-dashboard-menu');
+              window.dispatchEvent(evt);
+            }
+          }}
+          className="absolute left-2 top-1/2 -translate-y-1/2 z-10 md:hidden text-[#7F2982] bg-white/80 rounded-full p-2 shadow-md hover:bg-[#F7717D]/10 transition"
+          aria-label="Open menu"
         >
-          Delete Chat
-        </button> */}
+          <Menu size={24} />
+        </button>
+        <span className="mx-auto md:mx-0">{receiver?.name || "your buddy"}</span>
+        {selectedChats.length > 0 && (
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="ml-2 md:ml-4 p-2 rounded-full bg-[#F7717D]/10 hover:bg-[#F7717D]/20 text-[#F7717D] hover:text-[#DE639A] transition"
+            title="Delete Selected Messages"
+            aria-label="Delete Selected Messages"
+          >
+            <Trash2 size={20} />
+          </button>
+        )}
       </h1>
 
-      {/* {showDeleteModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-          <div className="bg-white rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center">
-            <h2 className="text-xl font-bold text-[#F7717D] mb-4">
-              Delete Chat?
-            </h2>
-            <p className="mb-6 text-[#7F2982]">
-              Are you sure you want to delete this chat? This cannot be undone.
-            </p>
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={() => setShowDeleteModal(false)}
-                className="px-4 py-2 rounded-lg bg-gray-200 text-[#7F2982] font-semibold hover:bg-gray-300 transition"
+      <div className="flex-1 overflow-y-auto p-2 md:p-4 bg-[#F8F6FC] space-y-3">
+        {messages.length === 0 ? (
+          <div className="flex flex-col items-center justify-center h-full py-16 text-center text-[#7F2982]/80">
+            <svg width="48" height="48" fill="none" viewBox="0 0 64 64" className="mx-auto mb-4">
+              <circle cx="32" cy="32" r="32" fill="#F7717D" fillOpacity="0.1"/>
+              <path d="M20 40h24M24 28h16M28 36h8" stroke="#DE639A" strokeWidth="2" strokeLinecap="round"/>
+              <ellipse cx="32" cy="32" rx="16" ry="12" fill="#F7717D" fillOpacity="0.15"/>
+            </svg>
+            <div className="text-lg md:text-xl font-semibold mb-2">No messages yet</div>
+            <div className="text-sm md:text-base">Start the conversation with <span className="font-bold">{receiver?.name || "your buddy"}</span>!</div>
+          </div>
+        ) : (
+          messages.map((msg) => (
+            <div
+              key={msg.id}
+              onClick={() => toggleChatSelection(msg.id)}
+              className={`p-3 rounded-md cursor-pointer ${
+                selectedChats.includes(msg.id) ? "bg-[#7F2982]/10" : "hover:bg-gray-100"
+              }`}
+            >
+              <div
+                key={`${msg.id}-${msg.createdAt?.seconds ?? Math.random()}`}
+                className={`break-words max-w-[80%] sm:max-w-xs md:max-w-md p-2 md:p-3 rounded-2xl shadow-md text-sm md:text-base ${
+                  msg.sender === uid
+                    ? "bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] text-white ml-auto"
+                    : "bg-white border border-[#E0E0E0] text-[#1E1E1E] mr-auto"
+                }`}
               >
-                Cancel
-              </button>
-              <button
-                onClick={async () => {
-                  setShowDeleteModal(false); // optional if using a confirmation modal
-                  if (chatId && id) {
-                    await handleDeleteSingleMessage(chatId, id);
-                  }
-                }}
-                className="px-4 py-2 rounded-lg bg-[#F7717D] text-white font-semibold hover:bg-[#DE639A] transition"
-              >
-                Delete
-              </button>
+                <p>{msg.text}</p>
+                <p className="text-xs text-right mt-1 opacity-60">
+                  {msg.createdAt?.toDate?.().toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              </div>
             </div>
-          </div>
-        </div>
-      )} */}
-
-      <div className="flex-1 overflow-y-auto p-4 bg-[#F8F6FC] space-y-3">
-        {messages.map((msg) => (
-          <div
-            key={`${msg.id}-${msg.createdAt?.seconds ?? Math.random()}`}
-            className={`max-w-xs p-3 rounded-2xl shadow-md ${
-              msg.sender === uid
-                ? "bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] text-white ml-auto"
-                : "bg-white border border-[#E0E0E0] text-[#1E1E1E] mr-auto"
-            }`}
-          >
-            <p>{msg.text}</p>
-            <p className="text-xs text-right mt-1 opacity-60">
-              {msg.createdAt?.toDate?.().toLocaleTimeString([], {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-          </div>
-        ))}
+          ))
+        )}
         <div ref={bottomRef} />
       </div>
 
+      {/* Delete Chats Modal */}
+      <DeleteChatsModal
+        open={showDeleteModal && selectedChats.length > 0}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteChat}
+      />
+
       <form
         onSubmit={handleSubmit}
-        className="p-4 border-t flex items-center gap-2 bg-white sticky bottom-0"
+        className="p-2 md:p-4 border-t flex items-center gap-2 bg-white sticky bottom-0 w-full flex-wrap md:flex-nowrap"
       >
         <button
           type="button"
           onClick={() => setShowEmojiPicker((prev) => !prev)}
-          className="text-[#7F2982] hover:text-[#F7717D] transition"
+          className="text-[#7F2982] hover:text-[#F7717D] transition flex-shrink-0"
         >
           <Smile size={24} />
         </button>
-        {showEmojiPicker && <EmojiPicker onEmojiSelect={handleSelectEmoji} />}
+        {showEmojiPicker && (
+          <div className="absolute left-2 bottom-16 md:bottom-16 z-50 max-w-[90vw]">
+            <EmojiPicker onEmojiSelect={handleSelectEmoji} />
+          </div>
+        )}
         <input
           ref={inputRef}
           value={newMessage}
           onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Type your message..."
-          className="flex-1 bg-[#F8F6FC] text-[#1E1E1E] placeholder:text-[#7F2982] border border-[#E0E0E0] px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DE639A]"
+          className="flex-1 min-w-0 bg-[#F8F6FC] text-[#1E1E1E] placeholder:text-[#7F2982] border border-[#E0E0E0] px-2 md:px-4 py-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#DE639A] text-sm md:text-base"
         />
         <button
           type="submit"
-          className="bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] text-white font-bold px-4 py-2 rounded-xl shadow-md hover:from-[#DE639A] hover:to-[#F7717D] transition"
+          className="bg-gradient-to-r from-[#F7717D] via-[#DE639A] to-[#7F2982] text-white font-bold px-3 md:px-4 py-2 rounded-xl shadow-md hover:from-[#DE639A] hover:to-[#F7717D] transition text-sm md:text-base flex-shrink-0"
         >
           Send
         </button>
       </form>
+
+  
     </div>
   );
 }
