@@ -1,10 +1,11 @@
 import React, { RefObject } from "react";
+import { Timestamp } from "firebase/firestore";
 
 interface Message {
   id: string;
   text: string;
   sender: string;
-  createdAt: any;
+  createdAt: Timestamp;
 }
 
 interface MessageListProps {
