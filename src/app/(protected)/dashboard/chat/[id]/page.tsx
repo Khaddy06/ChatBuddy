@@ -20,9 +20,9 @@ import { useChatMessages } from "@/app/hooks/useChatMessage";
 import { useReceiver } from "@/app/hooks/useReceiver";
 import { useSendMessage } from "@/app/hooks/useSendMessage";
 import { Trash2 } from "lucide-react";
-import DeleteChatsModal from "../components/deleteModal";
-import ChatForm from "../components/ChatForm";
-import MessageList from "../components/MessageList";
+import DeleteChatsModal from "./components/deleteModal";
+import ChatForm from "./components/ChatForm";
+import MessageList from "./components/MessageList";
 
 export default function ChatPage() {
   const rawId = useParams().id;

@@ -33,6 +33,7 @@ export default function ChatListPage() {
   //   toast("🔔 Toast is working!");
   // }, []);
   // Get current user UID
+  
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
       if (user) setUid(user.uid);
