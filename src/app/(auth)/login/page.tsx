@@ -27,18 +27,29 @@ export default function LoginPage() {
     resolver: yupResolver(schema),
   });
   const onSubmit = async (data: { email: string; password: string }) => {
-    try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success("Login Successfully");
-      router.push("/dashboard/chat");
-} catch (error: unknown) {
-  if (error instanceof Error) {
-    toast.error(`Login failed ❌: ${error.message}`);
-  } else {
-    toast.error("Login failed ❌: Unknown error");
+  try {
+    await signInWithEmailAndPassword(auth, data.email, data.password);
+    toast.success("Login Successfully");
+
+    // ✅ Ask for notification permission
+    const permission = await Notification.requestPermission();
+    if (permission === "granted") {
+      console.log("✅ Notification permission granted");
+      // optionally call getToken() here if you're using Firebase Messaging
+    } else {
+      console.warn("🚫 Notification permission denied or dismissed");
+    }
+
+    router.push("/dashboard/chat");
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      toast.error(`Login failed ❌: ${error.message}`);
+    } else {
+      toast.error("Login failed ❌: Unknown error");
+    }
   }
-}
-  };
+};
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#F8F6FC] px-4">
       <div className="w-full max-w-xl bg-white p-10 rounded-3xl shadow-2xl border border-[#E0E0E0]">

@@ -1,6 +1,5 @@
-// hooks/useChatMessages.ts
 "use client";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import {
   collection,
   onSnapshot,
@@ -9,6 +8,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { showNotification } from "@/lib/showNotification";
 
 export interface Message {
   id: string;
@@ -23,6 +23,7 @@ export function useChatMessages(
   receiverName?: string
 ) {
   const [messages, setMessages] = useState<Message[]>([]);
+  const lastMessageIdRef = useRef<string | null>(null); // 👈 Track last message ID
 
   useEffect(() => {
     if (!chatId || !uid) return;
@@ -43,18 +44,21 @@ export function useChatMessages(
         };
       });
 
+      const lastMessage = all[all.length - 1];
+
+      if (
+        lastMessage &&
+        lastMessage.id !== lastMessageIdRef.current &&
+        lastMessage.sender !== uid
+      ) {
+        showNotification({
+          title: receiverName || "New message",
+          body: lastMessage.text,
+        });
+        lastMessageIdRef.current = lastMessage.id; // 👈 Update reference
+      }
+
       setMessages(all);
-
-
-      // if (
-      //   last &&
-      //   last.type === "added" &&
-      //   last.doc.data().sender !== uid &&
-      //   Notification.permission === "granted" &&
-      //   isPageVisible()
-      // ) {
-      //   showNotification(receiverName || "New message", last.doc.data().text);
-      // }
     });
 
     return () => unsubscribe();

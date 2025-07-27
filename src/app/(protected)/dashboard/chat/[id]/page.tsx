@@ -23,24 +23,44 @@ import { Trash2 } from "lucide-react";
 import DeleteChatsModal from "./components/deleteModal";
 import ChatForm from "./components/ChatForm";
 import MessageList from "./components/MessageList";
+import { useActiveChatStore } from "@/store/useActiveChatStore";
+import { useCurrentUser } from "@/app/hooks/useCurrentUser";
 
 export default function ChatPage() {
   const rawId = useParams().id;
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
+  const setActiveChatId = useActiveChatStore((state) => state.setActiveChatId);
   const uid = useAuthUid();
   const receiver = useReceiver(id || null);
+  const senderName = receiver?.name || "Unknown"; // ✅ Fix: Define senderName
   const chatId = useMemo(
     () => (uid && id ? getChatId(uid, id) : null),
     [uid, id]
   );
+  const user = useCurrentUser();
+  useEffect(() => {
+    if (user) {
+      console.log("Current user:", user);
+    }     
+  }, [user]);
+
   const messages = useChatMessages(chatId, uid, receiver?.name);
-  const sendMessage = useSendMessage(chatId, uid, id || null);
+  const sendMessage = useSendMessage(
+    chatId,
+    uid,
+    receiver?.uid || null, // ✅ Fix: Use receiver?.uid
+    senderName // ✅ Fix: Pass the senderName properly
+  );
+
   const [newMessage, setNewMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [selectedChats, setSelectedChats] = useState<string[]>([]);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // ... rest of your component remains unchanged ...
+
 
   const toggleChatSelection = (chatId: string) => {
     setSelectedChats((prev) =>
@@ -49,6 +69,11 @@ export default function ChatPage() {
         : [...prev, chatId]
     );
   };
+ console.log("Current user UID:", uid);
+console.log("Receiver UID (from URL):", id);
+console.log("Generated Chat ID:", chatId);
+
+
 
   // Handle emoji select
   const handleSelectEmoji = (emoji: { native: string }) => {
@@ -82,17 +107,27 @@ export default function ChatPage() {
     );
   }, [chatId, uid]);
 
+  useEffect(() => {
+  setActiveChatId(id || null);
+  return () => setActiveChatId(null); // Clear when leaving
+}, [id, setActiveChatId]);
+
   // Auto-scroll to bottom on new message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMessage.trim()) return;
-    sendMessage(newMessage);
-    setNewMessage("");
-  };
+  
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!newMessage.trim() || !uid || !id || !receiver?.name) return;
+
+  // Call the already defined sendMessage function from the hook
+  sendMessage(newMessage);
+
+  setNewMessage("");
+};
+
 
   const handleDeleteChat = async () => {
     if (!chatId) return;

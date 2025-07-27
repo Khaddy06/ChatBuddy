@@ -19,6 +19,8 @@ export default function ProtectedLayout({
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         setAuthenticated(true);
+        //save user id
+        localStorage.setItem("userId",user.uid)
       } else {
         router.push("/login");
       }

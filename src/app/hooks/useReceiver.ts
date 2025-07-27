@@ -5,7 +5,10 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 
 interface Receiver {
+  uid: string;
   name: string;
+  email?: string; // optional, if needed
+  // Add other fields from your Firestore user document
 }
 
 export function useReceiver(id: string | null) {
@@ -15,7 +18,10 @@ export function useReceiver(id: string | null) {
     if (!id) return;
     const fetchReceiver = async () => {
       const snap = await getDoc(doc(db, "users", id));
-      if (snap.exists()) setReceiver(snap.data() as Receiver);
+      if (snap.exists()) {
+        const data = snap.data();
+        setReceiver({ uid: snap.id, ...data } as Receiver);
+      }
     };
     fetchReceiver();
   }, [id]);

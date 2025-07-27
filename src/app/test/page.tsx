@@ -1,41 +1,46 @@
-"use client";
-import { useEffect, useState } from "react";
-import { getMessagingInstance } from "@/lib/firebase";
-import { getToken } from "firebase/messaging";
+// "use client";
 
-export default function NotificationsTestPage() {
-  const [token, setToken] = useState<string | null>(null);
+// import { useState } from "react";
 
-  useEffect(() => {
-    const fetchToken = async () => {
-      try {
-        const messaging = await getMessagingInstance();
-        if (!messaging) return console.warn("No messaging instance");
+// export default function TestNotification() {
+//   const [loading, setLoading] = useState(false);
 
-        const fcmToken = await getToken(messaging, {
-          vapidKey: process.env.NEXT_PUBLIC_FIREBASE_VAPID_KEY,
-        });
+//   const sendNotification = async () => {
+//     setLoading(true);
+//     try {
+//       const res = await fetch("/api/sendNotification", {
+//         method: "POST",
+//         headers: {
+//           "Content-Type": "application/json",
+//         },
+//         body: JSON.stringify({
+//           token: "fLhwQYDiv0RSVCOfWjhorE:APA91bElxPXJT-WkI5I4m0Hu-Jq-U_JWQAdpClEP1ZG-Kj2_woUl1kwyhg2_b6FS12lVx_pfc3G_CaI9hSeeuXnikVejlfPmPH_3YkCFvdqWg1vj0K5QpncW",
+//           title: "Test Notification",
+//           message: "This is a test push notification.",
+//           link: "https://your-app.com/chat/123",
+//         }),
+//       });
 
-        if (fcmToken) {
-          console.log("✅ FCM Token:", fcmToken);
-          setToken(fcmToken);
-        } else {
-          console.warn("⚠️ No registration token available.");
-        }
-      } catch (err) {
-        console.error("🔥 Error fetching FCM token:", err);
-      }
-    };
+//       const data = await res.json();
+//       console.log(data);
+//       alert(data.message || "Notification sent!");
+//     } catch (err) {
+//       console.error(err);
+//       alert("Something went wrong.");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
 
-    fetchToken();
-  }, []);
-
-  return (
-    <div className="p-6">
-      <h1 className="text-xl font-bold">Test FCM Notification</h1>
-      <p className="mt-4 text-sm break-words">
-        {token ?? "Fetching token..."}
-      </p>
-    </div>
-  );
-}
+//   return (
+//     <div className="p-6">
+//       <button
+//         onClick={sendNotification}
+//         className="bg-blue-600 text-white px-4 py-2 rounded"
+//         disabled={loading}
+//       >
+//         {loading ? "Sending..." : "Send Notification"}
+//       </button>
+//     </div>
+//   );
+// }
