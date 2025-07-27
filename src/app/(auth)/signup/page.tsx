@@ -21,7 +21,7 @@ const schema = yup.object().shape({
   confirmPassword: yup
     .string()
     .oneOf([yup.ref("password")], "password must match")
-    .required("Please confirm your password"),
+    .required("Please confirm your password again"),
 });
 
 export default function RegisterPage() {
