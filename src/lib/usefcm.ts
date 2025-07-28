@@ -13,7 +13,7 @@ export async function sendMessageNotification({
   message: string;
 }) {
   try {
-    const userDoc = await db.collection("users").doc(toUid).get();
+    const userDoc = await (db as FirebaseFirestore.Firestore).collection("users").doc(toUid).get();
     const fcmToken = userDoc.data()?.fcmToken;
 
     if (!fcmToken) {
