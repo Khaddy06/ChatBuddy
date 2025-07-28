@@ -2,29 +2,23 @@ import { cert, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import type { App } from "firebase-admin/app";
 
-let firebaseAdminApp: App;
+let firebaseAdminApp: App | null = null;
+let db: ReturnType<typeof getFirestore> | null = null;
 
-if (!getApps().length) {
-  const {
-    FIREBASE_PROJECT_ID,
-    FIREBASE_CLIENT_EMAIL,
-    FIREBASE_PRIVATE_KEY,
-  } = process.env;
-
-  if (!FIREBASE_PROJECT_ID || !FIREBASE_CLIENT_EMAIL || !FIREBASE_PRIVATE_KEY) {
-    throw new Error("Missing Firebase Admin environment variables.");
+if (typeof window === "undefined" && process.env.FIREBASE_PROJECT_ID) {
+  if (!getApps().length) {
+    firebaseAdminApp = initializeApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
+      }),
+    });
+  } else {
+    firebaseAdminApp = getApps()[0];
   }
 
-  firebaseAdminApp = initializeApp({
-    credential: cert({
-      projectId: FIREBASE_PROJECT_ID,
-      clientEmail: FIREBASE_CLIENT_EMAIL,
-      privateKey: FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
-    }),
-  });
-} else {
-  firebaseAdminApp = getApps()[0];
+  db = getFirestore(firebaseAdminApp);
 }
 
-export const db = getFirestore(firebaseAdminApp);
-export { firebaseAdminApp };
+export { firebaseAdminApp, db };
